@@ -6,6 +6,7 @@
 * Fix #5845: (crd-generator) Fail generating if multiple versions are marked as stored
 
 #### Improvements
+* Fix #5836: (crd-generator) Add support for size constraints
 
 #### Dependency Upgrade
 

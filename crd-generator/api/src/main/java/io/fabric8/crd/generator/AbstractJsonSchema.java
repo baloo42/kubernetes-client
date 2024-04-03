@@ -109,6 +109,7 @@ public abstract class AbstractJsonSchema<T, B> {
   public static final String ANNOTATION_DEFAULT = "io.fabric8.generator.annotation.Default";
   public static final String ANNOTATION_MIN = "io.fabric8.generator.annotation.Min";
   public static final String ANNOTATION_MAX = "io.fabric8.generator.annotation.Max";
+  public static final String ANNOTATION_SIZE = "io.fabric8.generator.annotation.Size";
   public static final String ANNOTATION_PATTERN = "io.fabric8.generator.annotation.Pattern";
   public static final String ANNOTATION_NULLABLE = "io.fabric8.generator.annotation.Nullable";
   public static final String ANNOTATION_REQUIRED = "io.fabric8.generator.annotation.Required";
@@ -151,19 +152,31 @@ public abstract class AbstractJsonSchema<T, B> {
   }
 
   protected static class SchemaPropsOptions {
-    final String defaultValue;
-    final Double min;
-    final Double max;
-    final String pattern;
-    final boolean nullable;
-    final boolean required;
-    final boolean preserveUnknownFields;
-    final List<KubernetesValidationRule> validationRules;
+    private final String defaultValue;
+    private final Double min;
+    private final Long minItems;
+    private final Long minProperties;
+    private final Long minLength;
+    private final Double max;
+    private final Long maxItems;
+    private final Long maxProperties;
+    private final Long maxLength;
+    private final String pattern;
+    private final boolean nullable;
+    private final boolean required;
+    private final boolean preserveUnknownFields;
+    private final List<KubernetesValidationRule> validationRules;
 
     SchemaPropsOptions() {
       defaultValue = null;
       min = null;
+      minItems = null;
+      minProperties = null;
+      minLength = null;
       max = null;
+      maxItems = null;
+      maxProperties = null;
+      maxLength = null;
       pattern = null;
       nullable = false;
       required = false;
@@ -171,12 +184,21 @@ public abstract class AbstractJsonSchema<T, B> {
       validationRules = null;
     }
 
-    public SchemaPropsOptions(String defaultValue, Double min, Double max, String pattern,
+    public SchemaPropsOptions(String defaultValue,
+        Double min, Long minItems, Long minProperties, Long minLength,
+        Double max, Long maxItems, Long maxProperties, Long maxLength,
+        String pattern,
         List<KubernetesValidationRule> validationRules,
         boolean nullable, boolean required, boolean preserveUnknownFields) {
       this.defaultValue = defaultValue;
       this.min = min;
+      this.minItems = minItems;
+      this.minProperties = minProperties;
+      this.minLength = minLength;
       this.max = max;
+      this.maxItems = maxItems;
+      this.maxProperties = maxProperties;
+      this.maxLength = maxLength;
       this.pattern = pattern;
       this.nullable = nullable;
       this.required = required;
@@ -192,8 +214,32 @@ public abstract class AbstractJsonSchema<T, B> {
       return Optional.ofNullable(min);
     }
 
+    public Optional<Long> getMinItems() {
+      return Optional.ofNullable(minItems);
+    }
+
+    public Optional<Long> getMinProperties() {
+      return Optional.ofNullable(minProperties);
+    }
+
+    public Optional<Long> getMinLength() {
+      return Optional.ofNullable(minLength);
+    }
+
     public Optional<Double> getMax() {
       return Optional.ofNullable(max);
+    }
+
+    public Optional<Long> getMaxItems() {
+      return Optional.ofNullable(maxItems);
+    }
+
+    public Optional<Long> getMaxProperties() {
+      return Optional.ofNullable(maxProperties);
+    }
+
+    public Optional<Long> getMaxLength() {
+      return Optional.ofNullable(maxLength);
     }
 
     public Optional<String> getPattern() {
@@ -354,10 +400,40 @@ public abstract class AbstractJsonSchema<T, B> {
         possiblyUpdatedSchema = addDescription(schema, description);
       }
 
+      Long minItems = null;
+      Long minProperties = null;
+      Long minLength = null;
+      Long maxItems = null;
+      Long maxProperties = null;
+      Long maxLength = null;
+
+      if (facade.size != null) {
+        if (io.sundr.model.utils.Types.isArray(possiblyRenamedProperty.getTypeRef())
+            || io.sundr.model.utils.Types.isList(possiblyRenamedProperty.getTypeRef())) {
+          minItems = facade.size.getMin().orElse(null);
+          maxItems = facade.size.getMax().orElse(null);
+        } else if (io.sundr.model.utils.Types.isMap(possiblyRenamedProperty.getTypeRef())) {
+          minProperties = facade.size.getMin().orElse(null);
+          maxProperties = facade.size.getMax().orElse(null);
+        } else if (possiblyRenamedProperty.getTypeRef().equals(STRING_REF)) {
+          minLength = facade.size.getMin().orElse(null);
+          maxLength = facade.size.getMax().orElse(null);
+        } else {
+          LOGGER.warn("@Size is used on an unsupported type ({}) in {}.{} and is therefore ignored",
+              possiblyRenamedProperty.getTypeRef(), definition.getFullyQualifiedName(), possiblyRenamedProperty.getName());
+        }
+      }
+
       SchemaPropsOptions options = new SchemaPropsOptions(
           facade.defaultValue,
           facade.min,
+          minItems,
+          minProperties,
+          minLength,
           facade.max,
+          maxItems,
+          maxProperties,
+          maxLength,
           facade.pattern,
           facade.validationRules,
           facade.nullable,
@@ -396,6 +472,7 @@ public abstract class AbstractJsonSchema<T, B> {
     private String defaultValue;
     private Double min;
     private Double max;
+    private SizeInfo size;
     private String pattern;
     private List<KubernetesValidationRule> validationRules;
     private boolean nullable;
@@ -437,6 +514,9 @@ public abstract class AbstractJsonSchema<T, B> {
             break;
           case ANNOTATION_PATTERN:
             pattern = (String) a.getParameters().get(VALUE);
+            break;
+          case ANNOTATION_SIZE:
+            size = SizeInfo.from(a);
             break;
           case ANNOTATION_REQUIRED:
             required = true;
@@ -496,6 +576,10 @@ public abstract class AbstractJsonSchema<T, B> {
       return Optional.ofNullable(pattern);
     }
 
+    public Optional<SizeInfo> getSize() {
+      return Optional.ofNullable(size);
+    }
+
     public Optional<List<KubernetesValidationRule>> getValidationRules() {
       return Optional.ofNullable(validationRules);
     }
@@ -545,6 +629,7 @@ public abstract class AbstractJsonSchema<T, B> {
     private String defaultValue;
     private Double min;
     private Double max;
+    private SizeInfo size;
     private String pattern;
     private boolean nullable;
     private boolean required;
@@ -578,6 +663,7 @@ public abstract class AbstractJsonSchema<T, B> {
       min = null;
       max = null;
       pattern = null;
+      size = null;
       validationRules = new LinkedList<>();
     }
 
@@ -608,6 +694,7 @@ public abstract class AbstractJsonSchema<T, B> {
         min = p.getMin().orElse(min);
         max = p.getMax().orElse(max);
         pattern = p.getPattern().orElse(pattern);
+        size = p.getSize().orElse(size);
         p.getValidationRules().ifPresent(rules -> validationRules.addAll(rules));
 
         if (p.isNullable()) {

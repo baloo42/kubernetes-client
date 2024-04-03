@@ -18,6 +18,7 @@ package io.fabric8.crd.generator;
 import io.fabric8.crd.example.k8svalidation.K8sValidation;
 import io.fabric8.crd.example.multiple.v2.MultipleSpec;
 import io.fabric8.crd.example.nonconversion.NoneConversionExample;
+import io.fabric8.crd.example.size.SizeExample;
 import io.fabric8.crd.example.webhookconversion.v1.WebhookConversionExample;
 import io.fabric8.kubernetes.client.CustomResource;
 import io.fabric8.kubernetes.model.annotation.Group;
@@ -63,6 +64,11 @@ class CRDGeneratorExamplesTest {
   @Test
   void noneConversion() {
     assertCRDOutputEquals(newCRDGenerator(), NoneConversionExample.class);
+  }
+
+  @Test
+  void size() {
+    assertCRDOutputEquals(newCRDGenerator(), SizeExample.class);
   }
 
   private CRDGenerator newCRDGenerator() {

@@ -231,6 +231,55 @@ The field will have the `maximum` property in the generated CRD, such as:
             type: object
 ```
 
+### io.fabric8.generator.annotation.Size
+
+If a field or one of its accessors is annotated with `io.fabric8.generator.annotation.Size`
+
+```java
+public class ExampleSpec {
+  @Size(min = 1, max = 3)
+  String stringWithLowerAndUpperLimits;
+  @Size(min = 1, max = 3)
+  List<String> listWithLowerAndUpperLimits;
+  @Size(min = 1, max = 3)
+  String[] arrayWithLowerAndUpperLimits;
+  @Size(min = 1, max = 3)
+  Map<String, String> mapWithLowerAndUpperLimits;
+}
+```
+
+The field will have the `minLength`/`maxLength` or `minItems`/`maxItems` or `minProperties`/`maxProperties` properties in the generated CRD, such as:
+
+```yaml
+          spec:
+            properties:
+              stringWithLowerAndUpperLimits:
+                maxLength: 3
+                minLength: 1
+                type: string
+              listWithLowerAndUpperLimits:
+                items:
+                  type: string
+                maxItems: 3
+                minItems: 1
+                type: array
+              arrayWithLowerAndUpperLimits:
+                items:
+                  type: string
+                maxItems: 3
+                minItems: 1
+                type: array
+              mapWithLowerAndUpperLimits:
+                additionalProperties:
+                  type: string
+                maxProperties: 3
+                minProperties: 1
+                type: object
+            type: object
+```
+
+Note that `@Size` constraints are ignored on unsupported types.
+
 ### io.fabric8.generator.annotation.Pattern
 
 If a field or one of its accessors is annotated with `io.fabric8.generator.annotation.Pattern`
@@ -577,25 +626,26 @@ spec:
 
 ## Features cheatsheet
 
-| Annotation                                                  | Description                                                                           |
-|-------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| `com.fasterxml.jackson.annotation.JsonProperty`             | The field is named after the provided value instead of looking up the java field name |
-| `com.fasterxml.jackson.annotation.JsonPropertyDescription`  | The provided text is be embedded in the `description` of the field                    |
-| `com.fasterxml.jackson.annotation.JsonIgnore`               | The field is ignored                                                                  |
-| `io.fabric8.crd.generator.annotation.PreserveUnknownFields` | The field have `x-kubernetes-preserve-unknown-fields: true` defined                   |
-| `com.fasterxml.jackson.annotation.JsonAnyGetter`            | The corresponding object have `x-kubernetes-preserve-unknown-fields: true` defined    |
-| `com.fasterxml.jackson.annotation.JsonAnySetter`            | The corresponding object have `x-kubernetes-preserve-unknown-fields: true` defined    |
-| `io.fabric8.generator.annotation.Min`                       | The field defines a validation `min`                                                  |
-| `io.fabric8.generator.annotation.Max`                       | The field defines a validation `max`                                                  |
-| `io.fabric8.generator.annotation.Pattern`                   | The field defines a validation `pattern`                                              |
-| `io.fabric8.generator.annotation.Nullable`                  | The field is marked as `nullable`                                                     |
-| `io.fabric8.generator.annotation.Required`                  | The field is marked as `required`                                                     |
-| `io.fabric8.generator.annotation.ValidationRule`            | The field or object is validated by a CEL rule                                        |
-| `io.fabric8.crd.generator.annotation.SchemaFrom`            | The field type for the generation is the one coming from the annotation               |
-| `io.fabric8.crd.generator.annotation.SchemaSwap`            | Similar to SchemaFrom, but can be applied at any point in the class hierarchy         |
-| `io.fabric8.crd.generator.annotation.Annotations`           | Additional `annotations` in `metadata`                                                |
-| `io.fabric8.crd.generator.annotation.Labels`                | Additional `labels` in `metadata`                                                     |
-| `io.fabric8.crd.generator.annotation.PrinterColumn`         | Customize columns shown by the `kubectl get` command                                  |
+| Annotation                                                  | Description                                                                                                       |
+|-------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
+| `com.fasterxml.jackson.annotation.JsonProperty`             | The field is named after the provided value instead of looking up the java field name                             |
+| `com.fasterxml.jackson.annotation.JsonPropertyDescription`  | The provided text is be embedded in the `description` of the field                                                |
+| `com.fasterxml.jackson.annotation.JsonIgnore`               | The field is ignored                                                                                              |
+| `io.fabric8.crd.generator.annotation.PreserveUnknownFields` | The field have `x-kubernetes-preserve-unknown-fields: true` defined                                               |
+| `com.fasterxml.jackson.annotation.JsonAnyGetter`            | The corresponding object have `x-kubernetes-preserve-unknown-fields: true` defined                                |
+| `com.fasterxml.jackson.annotation.JsonAnySetter`            | The corresponding object have `x-kubernetes-preserve-unknown-fields: true` defined                                |
+| `io.fabric8.generator.annotation.Min`                       | The field defines a validation `min`                                                                              |
+| `io.fabric8.generator.annotation.Max`                       | The field defines a validation `max`                                                                              |
+| `io.fabric8.generator.annotation.Size`                      | The field defines validations `minLength`/`maxLength` or `minItems`/`maxItems` or `minProperties`/`maxProperties` |
+| `io.fabric8.generator.annotation.Pattern`                   | The field defines a validation `pattern`                                                                          |
+| `io.fabric8.generator.annotation.Nullable`                  | The field is marked as `nullable`                                                                                 |
+| `io.fabric8.generator.annotation.Required`                  | The field is marked as `required`                                                                                 |
+| `io.fabric8.generator.annotation.ValidationRule`            | The field or object is validated by a CEL rule                                                                    |
+| `io.fabric8.crd.generator.annotation.SchemaFrom`            | The field type for the generation is the one coming from the annotation                                           |
+| `io.fabric8.crd.generator.annotation.SchemaSwap`            | Similar to SchemaFrom, but can be applied at any point in the class hierarchy                                     |
+| `io.fabric8.crd.generator.annotation.Annotations`           | Additional `annotations` in `metadata`                                                                            |
+| `io.fabric8.crd.generator.annotation.Labels`                | Additional `labels` in `metadata`                                                                                 |
+| `io.fabric8.crd.generator.annotation.PrinterColumn`         | Customize columns shown by the `kubectl get` command                                                              |
 
 
 A field of type `com.fasterxml.jackson.databind.JsonNode` is encoded as an empty object with `x-kubernetes-preserve-unknown-fields: true` defined.
