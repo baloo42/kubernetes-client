@@ -17,25 +17,33 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
+    <artifactId>crd-generator-parent</artifactId>
     <groupId>io.fabric8</groupId>
-    <artifactId>kubernetes-client-project</artifactId>
     <version>6.13-SNAPSHOT</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>crd-generator-parent</artifactId>
-  <packaging>pom</packaging>
-  <name>Fabric8 :: CRD generator :: Parent</name>
+  <artifactId>crd-generator-collector</artifactId>
+  <name>Fabric8 :: CRD generator :: Collector</name>
 
-  <modules>
-    <module>apt</module>
-    <module>api</module>
-    <module>api-v2</module>
-    <module>collector</module>
-    <module>maven-plugin</module>
-    <module>test</module>
-  </modules>
+  <packaging>jar</packaging>
+
+  <properties>
+    <jandex.version>3.1.7</jandex.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.fabric8</groupId>
+      <artifactId>crd-generator-api-v2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.smallrye</groupId>
+      <artifactId>jandex</artifactId>
+      <version>${jandex.version}</version>
+    </dependency>
+  </dependencies>
 </project>
