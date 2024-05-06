@@ -117,7 +117,7 @@
         <version>2.1.1</version>
         <configuration>
             <flags>-Xmx1G</flags>
-            <programFile>java-gen</programFile>
+            <programFile>crd-gen</programFile>
             <attachProgramFile>true</attachProgramFile>
         </configuration>
 
