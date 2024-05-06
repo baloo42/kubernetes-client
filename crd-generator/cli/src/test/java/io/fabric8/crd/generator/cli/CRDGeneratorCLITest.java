@@ -28,11 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CRDGeneratorCLITest {
 
   @Test
-  public void givenNoInput_thenGenerateNoCRDs() {
+  public void givenNoInput_thenFailAndGenerateNoCRDs() {
     CRDGeneratorCLI cliApp = new CRDGeneratorCLI();
     CommandLine cmd = new CommandLine(cliApp);
     int exitCode = cmd.execute();
-    assertEquals(0, exitCode);
+    assertEquals(2, exitCode);
     assertEquals(0, cliApp.getCrdGenerationInfo().numberOfGeneratedCRDs());
   }
 
@@ -41,8 +41,8 @@ public class CRDGeneratorCLITest {
     CRDGeneratorCLI cliApp = new CRDGeneratorCLI();
     CommandLine cmd = new CommandLine(cliApp);
     String[] args = new String[] {
-        "-cr", "io.fabric8.crd.generator.cli.examples.basic.Basic",
-        "-o", tempDir.toString()
+        "-o", tempDir.toString(),
+        "io.fabric8.crd.generator.cli.examples.basic.Basic"
     };
     int exitCode = cmd.execute(args);
     assertEquals(0, exitCode);
@@ -55,9 +55,9 @@ public class CRDGeneratorCLITest {
     CRDGeneratorCLI cliApp = new CRDGeneratorCLI();
     CommandLine cmd = new CommandLine(cliApp);
     String[] args = new String[] {
-        "-cp", "../api-v2/target/test-classes/",
-        "-cr", "io.fabric8.crdv2.example.basic.Basic",
-        "-o", tempDir.toString()
+        "--classpath", "../api-v2/target/test-classes/",
+        "-o", tempDir.toString(),
+        "io.fabric8.crdv2.example.basic.Basic"
     };
 
     int exitCode = cmd.execute(args);
@@ -71,9 +71,8 @@ public class CRDGeneratorCLITest {
     CRDGeneratorCLI cliApp = new CRDGeneratorCLI();
     CommandLine cmd = new CommandLine(cliApp);
     String[] args = new String[] {
-        "-c", "target/test-classes/",
-        //"-k", "basics.sample.fabric8.io",
-        "-o", tempDir.toString()
+        "-o", tempDir.toString(),
+        "target/test-classes/"
     };
 
     int exitCode = cmd.execute(args);
