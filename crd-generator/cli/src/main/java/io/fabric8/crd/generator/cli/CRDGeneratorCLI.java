@@ -18,7 +18,7 @@ package io.fabric8.crd.generator.cli;
 import io.fabric8.crd.generator.collector.CustomResourceCollector;
 import io.fabric8.crdv2.generator.CRDGenerationInfo;
 import io.fabric8.crdv2.generator.CRDGenerator;
-import io.fabric8.crdv2.generator.CustomResourceInfo;
+import io.fabric8.kubernetes.api.model.HasMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.simple.SimpleLogger;
@@ -70,17 +70,8 @@ public class CRDGeneratorCLI implements Runnable {
   @CommandLine.Option(names = {
       "--include-package" }, description = "Use only Custom Resource classes of one or more packages.")
   List<String> includedPackages = new LinkedList<>();
-  @CommandLine.Option(names = { "--include-group" }, description = "Use only Custom Resources classes of one or more groups.")
-  List<String> includedGroups = new LinkedList<>();
-  @CommandLine.Option(names = {
-      "--include-version" }, description = "Use only Custom Resource classes of one or more versions.")
-  List<String> includedVersions = new LinkedList<>();
   @CommandLine.Option(names = { "--exclude-package" }, description = "Exclude Custom Resource classes by package.")
   List<String> excludedPackages = new LinkedList<>();
-  @CommandLine.Option(names = { "--exclude-group" }, description = "Exclude Custom Resource classes by group.")
-  List<String> excludedGroups = new LinkedList<>();
-  @CommandLine.Option(names = { "--exclude-version" }, description = "Exclude Custom Resource classes by version.")
-  List<String> excludedVersions = new LinkedList<>();
 
   @CommandLine.Option(names = {
       "-v" }, description = "Verbose mode. Helpful for troubleshooting. Multiple -v options increase the verbosity.")
@@ -93,7 +84,7 @@ public class CRDGeneratorCLI implements Runnable {
     System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, getLogLevel());
     log = LoggerFactory.getLogger(CRDGeneratorCLI.class);
 
-    List<String> customResourceClasses = source.stream()
+    List<String> customResourceClassNames = source.stream()
         .filter(s -> s.customResourceClass != null)
         .map(s -> s.customResourceClass)
         .collect(Collectors.toList());
@@ -110,20 +101,16 @@ public class CRDGeneratorCLI implements Runnable {
         .forEach(allClasspathElements::add);
 
     CustomResourceCollector customResourceCollector = new CustomResourceCollector()
-        .withClasspaths(allClasspathElements)
+        .withClasspathElements(allClasspathElements)
         .withFilesToIndex(filesToIndex)
         .withForceIndex(forceIndex)
-        .withCustomResourceClasses(customResourceClasses)
+        .withCustomResourceClasses(customResourceClassNames)
         .withIncludePackages(includedPackages)
-        .withIncludeGroups(includedGroups)
-        .withIncludeVersions(includedVersions)
-        .withExcludePackages(excludedPackages)
-        .withExcludeGroups(excludedGroups)
-        .withExcludeVersions(excludedVersions);
+        .withExcludePackages(excludedPackages);
 
-    CustomResourceInfo[] customResourceInfos = customResourceCollector.findCustomResources();
+    Class<? extends HasMetadata>[] customResourceClasses = customResourceCollector.findCustomResourceClasses();
 
-    log.info("Found {} CustomResources", customResourceInfos.length);
+    log.info("Found {} CustomResources", customResourceClasses.length);
 
     File sanitizedOutputDirectory;
     try {
@@ -139,7 +126,7 @@ public class CRDGeneratorCLI implements Runnable {
     }
 
     CRDGenerator crdGenerator = new CRDGenerator()
-        .customResources(customResourceInfos)
+        .customResourceClasses(customResourceClasses)
         .withParallelGenerationEnabled(!parallelDisabled)
         .withImplicitPreserveUnknownFields(implicitPreserveUnknownFields)
         .inOutputDir(sanitizedOutputDirectory);
@@ -173,7 +160,6 @@ public class CRDGeneratorCLI implements Runnable {
     int exitCode = new CommandLine(new CRDGeneratorCLI()).execute(args);
     System.exit(exitCode);
   }
-
 
   /**
    * Wraps a positional argument.
