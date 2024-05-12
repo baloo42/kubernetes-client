@@ -60,6 +60,10 @@ public class CRDGeneratorCLI implements Runnable {
       "--force-index" }, description = "Create Jandex index even if the directory or JAR file contains an existing index.", defaultValue = "false")
   Boolean forceIndex;
 
+  @CommandLine.Option(names = {
+    "--force-scan" }, description = "Create Jandex index even if the directory or JAR file contains an existing index.", defaultValue = "false")
+  Boolean forceScan;
+
   @CommandLine.Option(names = { "--no-parallel" }, description = "Disable parallel generation.", defaultValue = "false")
   Boolean parallelDisabled;
 
@@ -102,8 +106,9 @@ public class CRDGeneratorCLI implements Runnable {
 
     CustomResourceCollector customResourceCollector = new CustomResourceCollector()
         .withClasspathElements(allClasspathElements)
-        .withFilesToIndex(filesToIndex)
+        .withFilesToScan(filesToIndex)
         .withForceIndex(forceIndex)
+        .withForceScan(forceScan)
         .withCustomResourceClasses(customResourceClassNames)
         .withIncludePackages(includedPackages)
         .withExcludePackages(excludedPackages);
