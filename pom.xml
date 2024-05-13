@@ -101,6 +101,7 @@
     <maven-plugin-annotations.version>3.13.0</maven-plugin-annotations.version>
     <vertx.version>4.5.8</vertx.version>
     <zjsonpatch.version>0.3.0</zjsonpatch.version>
+    <jandex.version>3.1.8</jandex.version>
 
     <!-- API versions -->
     <jsr305.version>3.0.2</jsr305.version>
@@ -165,7 +166,6 @@
     <maven.plugin.plugin.version>3.13.0</maven.plugin.plugin.version>
     <gmavenplus-plugin.version>3.0.2</gmavenplus-plugin.version>
     <gradle-api-maven-plugin.version>0.0.5</gradle-api-maven-plugin.version>
-    <jandex.plugin.version>3.1.8</jandex.plugin.version>
     <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
     <jkube.version>1.16.2</jkube.version>
     <sonar-maven-plugin.version>3.11.0.3922</sonar-maven-plugin.version>
@@ -900,6 +900,11 @@
         <artifactId>okio</artifactId>
         <version>${okio.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.smallrye</groupId>
+        <artifactId>jandex</artifactId>
+        <version>${jandex.version}</version>
+      </dependency>
 
       <!-- Testing and Mocking -->
       <dependency>
@@ -1111,7 +1116,7 @@
         <plugin>
           <groupId>io.smallrye</groupId>
           <artifactId>jandex-maven-plugin</artifactId>
-          <version>${jandex.plugin.version}</version>
+          <version>${jandex.version}</version>
           <executions>
             <execution>
               <id>make-index</id>
