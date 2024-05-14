@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * CRD-Generator Command Line Interface.
  */
-@CommandLine.Command(name = "crd-gen", mixinStandardHelpOptions = true, helpCommand = true, versionProvider = KubernetesClientVersionProvider.class, sortOptions = false, description = "\nFabric8 CRD-Generator:\nGenerate Custom Resource Definitions (CRD) for Kubernetes from Java classes.\n")
+@CommandLine.Command(name = "crd-gen", mixinStandardHelpOptions = true, helpCommand = true, versionProvider = KubernetesClientVersionProvider.class, sortOptions = false, description = "\nFabric8 CRD-Generator:\nGenerate Custom Resource Definitions (CRD) for Kubernetes from Java model.\n")
 public class CRDGeneratorCLI implements Runnable {
 
   private static final CRDGenerationInfo EMPTY_INFO = new CRDGenerationInfo();
@@ -61,14 +61,14 @@ public class CRDGeneratorCLI implements Runnable {
   Boolean forceIndex;
 
   @CommandLine.Option(names = {
-    "--force-scan" }, description = "Create Jandex index even if the directory or JAR file contains an existing index.", defaultValue = "false")
+      "--force-scan" }, description = "Create Jandex index even if the directory or JAR file contains an existing index.", defaultValue = "false")
   Boolean forceScan;
 
   @CommandLine.Option(names = { "--no-parallel" }, description = "Disable parallel generation.", defaultValue = "false")
   Boolean parallelDisabled;
 
   @CommandLine.Option(names = {
-      "--implicit-preserve-unknown-fields" }, description = "Mark all objects with x-kubernetes-preserve-unknown-fields: true.", defaultValue = "false")
+      "--implicit-preserve-unknown-fields" }, description = "`x-kubernetes-preserve-unknown-fields: true` will be added to objects which contain an any-setter or any-getter", defaultValue = "false")
   Boolean implicitPreserveUnknownFields;
 
   @CommandLine.Option(names = {
