@@ -113,9 +113,9 @@ public class CRDGeneratorCLI implements Runnable {
         .withIncludePackages(includedPackages)
         .withExcludePackages(excludedPackages);
 
-    Class<? extends HasMetadata>[] customResourceClasses = customResourceCollector.findCustomResourceClasses();
+    List<Class<? extends HasMetadata>> customResourceClasses = customResourceCollector.findCustomResourceClasses();
 
-    log.info("Found {} CustomResources", customResourceClasses.length);
+    log.info("Found {} CustomResources", customResourceClasses.size());
 
     File sanitizedOutputDirectory;
     try {
