@@ -28,9 +28,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -137,6 +139,36 @@ public class CRDGeneratorCLI implements Runnable {
 
   // spotless:off
   @CommandLine.Option(
+    names = {"--header"},
+    description = "The header content.\n" +
+                  "If not empty, this text will be added as comment on top of each CRD file. " +
+                  "Multiline texts are supported and will be handled accordingly.",
+    defaultValue = CRDGenerator.DEFAULT_HEADER,
+    showDefaultValue = CommandLine.Help.Visibility.ALWAYS
+  )
+  // spotless:on
+  String header;
+
+  // spotless:off
+  @CommandLine.Option(
+    names = {"--label"},
+    paramLabel = "<<key>=<value>>",
+    description = "Additional label for all CRDs. Useful to add e.g. vcs or build details."
+  )
+  // spotless:on
+  Map<String, String> labels = new HashMap<>();
+
+  // spotless:off
+  @CommandLine.Option(
+    names = {"--annotation"},
+    paramLabel = "<<key>=<value>>",
+    description = "Additional annotation for all CRDs. Useful to add e.g. vcs or build details."
+  )
+  // spotless:on
+  Map<String, String> annotations = new HashMap<>();
+
+  // spotless:off
+  @CommandLine.Option(
     names = {"--include-package"},
     paramLabel = "<package>",
     description = "Filter Custom Resource classes after scanning by package inclusions."
@@ -218,6 +250,9 @@ public class CRDGeneratorCLI implements Runnable {
         .customResourceClasses(customResourceClasses)
         .withParallelGenerationEnabled(!parallelDisabled)
         .withImplicitPreserveUnknownFields(implicitPreserveUnknownFields)
+        .withHeader(header)
+        .withLabels(labels)
+        .withAnnotations(annotations)
         .inOutputDir(sanitizedOutputDirectory);
 
     crdGenerationInfo = crdGenerator.detailedGenerate();

@@ -261,6 +261,76 @@ class CRDGeneratorTest {
   }
 
   @Test
+  void checkHeaderOverride() {
+    CRDGenerator generator = newCRDGenerator()
+        .customResourceClasses(Joke.class)
+        .forCRDVersions("v1")
+        .withHeader("my header")
+        .withOutput(output);
+
+    generator.detailedGenerate();
+
+    String crdFileContent = output.getStreamFor("jokes.samples.javaoperatorsdk.io-v1").toString();
+    assertTrue(crdFileContent.startsWith("# my header\n"));
+  }
+
+  @Test
+  void checkMultilineHeaderOverride() {
+    CRDGenerator generator = newCRDGenerator()
+        .customResourceClasses(Joke.class)
+        .forCRDVersions("v1")
+        .withHeader("my multi\nline\nheader")
+        .withOutput(output);
+
+    generator.detailedGenerate();
+
+    String crdFileContent = output.getStreamFor("jokes.samples.javaoperatorsdk.io-v1").toString();
+    assertTrue(crdFileContent.startsWith("# my multi\n# line\n# header\n"));
+  }
+
+  @Test
+  void checkAdditionalLabels() {
+    Map<String, String> labels = new java.util.HashMap<>();
+    labels.put("label1", "label1value");
+    labels.put("label2", "label2value");
+
+    CRDGenerator generator = newCRDGenerator()
+        .customResourceClasses(Joke.class)
+        .forCRDVersions("v1")
+        .withLabels(labels)
+        .withOutput(output);
+
+    generator.detailedGenerate();
+
+    CustomResourceDefinition definition = output.definition("jokes.samples.javaoperatorsdk.io-v1");
+    assertTrue(definition.getMetadata().getLabels().containsKey("label1"));
+    assertEquals("label1value", definition.getMetadata().getLabels().get("label1"));
+    assertTrue(definition.getMetadata().getLabels().containsKey("label2"));
+    assertEquals("label2value", definition.getMetadata().getLabels().get("label2"));
+  }
+
+  @Test
+  void checkAdditionalAnnotations() {
+    Map<String, String> annotations = new java.util.HashMap<>();
+    annotations.put("annotation1", "annotation1value");
+    annotations.put("annotation2", "annotation2value");
+
+    CRDGenerator generator = newCRDGenerator()
+        .customResourceClasses(Joke.class)
+        .forCRDVersions("v1")
+        .withAnnotations(annotations)
+        .withOutput(output);
+
+    generator.detailedGenerate();
+
+    CustomResourceDefinition definition = output.definition("jokes.samples.javaoperatorsdk.io-v1");
+    assertTrue(definition.getMetadata().getAnnotations().containsKey("annotation1"));
+    assertEquals("annotation1value", definition.getMetadata().getAnnotations().get("annotation1"));
+    assertTrue(definition.getMetadata().getAnnotations().containsKey("annotation2"));
+    assertEquals("annotation2value", definition.getMetadata().getAnnotations().get("annotation2"));
+  }
+
+  @Test
   void generatingACycleInListShouldFail() {
     final CRDGenerator generator = newCRDGenerator()
         .customResourceClasses(CyclicList.class)

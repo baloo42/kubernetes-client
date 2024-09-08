@@ -31,8 +31,10 @@ import org.apache.maven.project.MavenProject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -124,6 +126,26 @@ public class CrdGeneratorMojo extends AbstractMojo {
   boolean implicitPreserveUnknownFields;
 
   /**
+   * The header content.
+   * If not empty, this text will be added as comment on top of each CRD file.
+   * Multiline texts are supported and will be handled accordingly.
+   */
+  @Parameter(property = "fabric8.crd-generator.header", defaultValue = CRDGenerator.DEFAULT_HEADER)
+  String header;
+
+  /**
+   * Additional labels for all CRDs. Useful to add e.g. vcs or build details.
+   */
+  @Parameter(property = "fabric8.crd-generator.labels")
+  Map<String, String> labels = new HashMap<>();
+
+  /**
+   * Additional annotations for all CRDs. Useful to add e.g. vcs or build details.
+   */
+  @Parameter(property = "fabric8.crd-generator.annotations")
+  Map<String, String> annotations = new HashMap<>();
+
+  /**
    * If {@code true}, execution will be skipped.
    */
   @Parameter(property = "fabric8.crd-generator.skip", defaultValue = "false")
@@ -178,6 +200,9 @@ public class CrdGeneratorMojo extends AbstractMojo {
         .customResourceClasses(customResourceClassesLoaded)
         .withParallelGenerationEnabled(parallel)
         .withImplicitPreserveUnknownFields(implicitPreserveUnknownFields)
+        .withHeader(header)
+        .withLabels(labels)
+        .withAnnotations(annotations)
         .inOutputDir(outputDirectory);
 
     CRDGenerationInfo crdGenerationInfo = crdGenerator.detailedGenerate();
