@@ -74,10 +74,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static io.fabric8.crdv2.generator.AnnotationUtils.consumeRepeatingAnnotation;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -146,17 +146,6 @@ public abstract class AbstractJsonSchema<T extends KubernetesJSONSchemaProps, V 
     }
     return resolveProperty(new LinkedHashMap<>(), schemaSwaps, null,
         resolvingContext.objectMapper.getSerializationConfig().constructType(definition), schema, null);
-  }
-
-  /**
-   * Walks up the class hierarchy to consume the repeating annotation
-   */
-  private static <A extends Annotation> void consumeRepeatingAnnotation(Class<?> beanClass, Class<A> annotation,
-      Consumer<A> consumer) {
-    while (beanClass != null && beanClass != Object.class) {
-      Stream.of(beanClass.getAnnotationsByType(annotation)).forEach(consumer);
-      beanClass = beanClass.getSuperclass();
-    }
   }
 
   Optional<Field> getFieldForMethod(BeanProperty beanProperty) {
