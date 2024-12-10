@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+    id 'io.fabric8.crd-generator' version "${fabric8ClientVersion}"
+}
+
+group = 'io.fabric8.crd-generator.gradle.plugin.it'
+version = '0.1-SNAPSHOT'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+    implementation "io.fabric8:kubernetes-client-api:${fabric8ClientVersion}"
+}
+
+java2crd {
+  customResourceClassNames = [
+    "io.fabric8.crd.maven.example.v1.Multiple",
+    "io.fabric8.crd.maven.example.v2.Multiple"
+  ]
+}
+
+build.dependsOn project.tasks["java2crd"]
